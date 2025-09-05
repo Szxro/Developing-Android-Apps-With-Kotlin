@@ -5,8 +5,8 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import com.example.button.ui.theme.ButtonTheme
-import com.example.button.view.ButtonScreenRoot
-import com.example.button.viewmodel.ButtonViewModel
+import com.example.button.view.DiceScreenRoot
+import com.example.button.viewmodel.DiceViewModel
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -14,9 +14,9 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             ButtonTheme {
-                val buttonViewModel: ButtonViewModel = ButtonViewModel();
+                val buttonViewModel: DiceViewModel = DiceViewModel();
 
-                ButtonScreenRoot(buttonViewModel);
+                DiceScreenRoot(buttonViewModel);
             }
         }
     }

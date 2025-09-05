@@ -18,23 +18,29 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import com.example.button.R
-import com.example.button.viewmodel.ButtonViewModel
-import kotlin.random.Random
+import com.example.button.viewmodel.DiceViewModel
 
 @Composable
-fun ButtonScreenRoot(viewModel: ButtonViewModel, modifier: Modifier = Modifier): Unit{
+fun DiceScreenRoot(viewModel: DiceViewModel, modifier: Modifier = Modifier): Unit{
     Box(
         modifier = Modifier.fillMaxSize(),
         contentAlignment = Alignment.Center
     ){
-        ButtonScreen(viewModel.getTextContent(),modifier);
+        DiceScreen(
+            initialDice = viewModel.getInitialDice(),
+            rollDice = viewModel::getDice, // passing the function as a lambda reference
+            modifier);
     }
 }
 
 @Composable
-private fun ButtonScreen(text: String, modifier: Modifier = Modifier):Unit{
-    var dice by remember { mutableIntStateOf(R.drawable.empty_dice) };
+private fun DiceScreen(
+    initialDice: Int,
+    rollDice: () -> Int,
+    modifier: Modifier = Modifier):Unit{
+    var dice by remember { mutableIntStateOf(initialDice) };
     Column(
+        modifier,
         verticalArrangement = Arrangement.Center, // Center vertically
         horizontalAlignment = Alignment.CenterHorizontally // Center horizontally
     ) {
@@ -43,7 +49,7 @@ private fun ButtonScreen(text: String, modifier: Modifier = Modifier):Unit{
             contentDescription = stringResource(id = R.string.roll)
         )
         Button(onClick = {
-            dice = rollDice();
+           dice = rollDice()
         }) {
             Text(
                 text = "Let's Roll"
@@ -52,23 +58,10 @@ private fun ButtonScreen(text: String, modifier: Modifier = Modifier):Unit{
     }
 }
 
-private fun rollDice(): Int{
-    val randomInt: Int = Random.nextInt(6) + 1;
-
-    return when(randomInt){
-        1 -> R.drawable.dice_1
-        2 -> R.drawable.dice_2
-        3 -> R.drawable.dice_3
-        4 -> R.drawable.dice_4
-        5 -> R.drawable.dice_5
-        else -> R.drawable.dice_6
-    }
-}
-
 @Preview(showBackground = true)
 @Composable
 private fun ButtonScreenPreview():Unit{
-    val buttonViewModel: ButtonViewModel = ButtonViewModel();
+    val buttonViewModel: DiceViewModel = DiceViewModel();
 
-    ButtonScreenRoot(buttonViewModel);
+    DiceScreenRoot(buttonViewModel);
 }
