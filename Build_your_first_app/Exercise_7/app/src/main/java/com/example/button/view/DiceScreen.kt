@@ -8,10 +8,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
@@ -27,18 +23,17 @@ fun DiceScreenRoot(viewModel: DiceViewModel, modifier: Modifier = Modifier): Uni
         contentAlignment = Alignment.Center
     ){
         DiceScreen(
-            initialDice = viewModel.getInitialDice(),
-            rollDice = viewModel::getDice, // passing the function as a lambda reference
+            dice = viewModel.dice,
+            rollDice = viewModel::rollDice, // passing the function as a lambda reference
             modifier);
     }
 }
 
 @Composable
 private fun DiceScreen(
-    initialDice: Int,
-    rollDice: () -> Int,
+    dice: Int,
+    rollDice: () -> Unit,
     modifier: Modifier = Modifier):Unit{
-    var dice by remember { mutableIntStateOf(initialDice) };
     Column(
         modifier,
         verticalArrangement = Arrangement.Center, // Center vertically
@@ -48,9 +43,7 @@ private fun DiceScreen(
             painter = painterResource(dice),
             contentDescription = stringResource(id = R.string.roll)
         )
-        Button(onClick = {
-           dice = rollDice()
-        }) {
+        Button(onClick = { rollDice() }) {
             Text(
                 text = "Let's Roll"
             );
@@ -61,7 +54,7 @@ private fun DiceScreen(
 @Preview(showBackground = true)
 @Composable
 private fun ButtonScreenPreview():Unit{
-    val buttonViewModel: DiceViewModel = DiceViewModel();
+    val diceViewModel = DiceViewModel();
 
-    DiceScreenRoot(buttonViewModel);
+    DiceScreenRoot(diceViewModel);
 }
