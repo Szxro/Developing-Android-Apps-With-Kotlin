@@ -1,23 +1,20 @@
 package com.example.sleepnight.ui.tracker
 
-import android.text.Layout
 import android.widget.Toast
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -25,15 +22,16 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.LineHeightStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.sleepnight.R;
 import com.example.sleepnight.common.util.DateUtils
+import com.example.sleepnight.data.model.SleepQualityUI
 import com.example.sleepnight.data.persistence.entities.SleepNight
 import com.example.sleepnight.ui.theme.SleepNightTheme
 import kotlinx.serialization.Serializable
@@ -74,7 +72,6 @@ fun TrackerScreen(
         onClearButton = viewModel::onClearTracking
     );
 }
-
 
 @Composable
 private fun TrackerScreenContent(
@@ -148,19 +145,39 @@ private fun TrackerScreenContent(
 }
 
 @Composable
-fun TrackerScreenListContent(
+private fun TrackerScreenListContent(
     night: SleepNight,
     modifier: Modifier = Modifier
 ):Unit{
-    Column(
-        horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = modifier
-            .fillMaxWidth()
-            .padding(vertical = 8.dp)
-    ) {
-        Text(text = "Start: ${DateUtils.millisToDate(night.startTimeMilliSeconds)}")
-        Text(text = "End: ${DateUtils.millisToDate(night.endTimeMilliSeconds)}")
-        Text(text = "Quality: ${night.sleepQuality}")
+    val (description, imageId) = getSleepQualityDescriptionAndImageId(night.sleepQuality);
+
+    Row(
+        modifier = modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.SpaceEvenly,
+    ){
+        Image(
+            painter = painterResource(imageId),
+            contentDescription = null,
+            modifier = modifier.size(75.dp)
+        )
+      Column {
+          Text(text = "Start: ${DateUtils.millisToDate(night.startTimeMilliSeconds)}")
+          Text(text = "Quality: $description")
+      }
+        Spacer(modifier = modifier.height(12.dp))
+    }
+}
+
+// Can implement simple logic into a screen , but more complex one is going to be in the view model
+private fun getSleepQualityDescriptionAndImageId(quality: Int): SleepQualityUI {
+    return when (quality) {
+        0 -> SleepQualityUI("Very Bad", R.drawable.ic_sleep_0)
+        1 -> SleepQualityUI("Poor", R.drawable.ic_sleep_1)
+        2 -> SleepQualityUI("So-so", R.drawable.ic_sleep_2)
+        3 -> SleepQualityUI("Okay", R.drawable.ic_sleep_3)
+        4 -> SleepQualityUI("Good", R.drawable.ic_sleep_4)
+        5 -> SleepQualityUI("Excellent", R.drawable.ic_sleep_5)
+        else -> SleepQualityUI("Unknown", R.drawable.ic_sleep_0)
     }
 }
 
