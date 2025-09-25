@@ -1,17 +1,23 @@
 package com.example.sleepnight.ui.tracker
 
+import android.text.Layout
 import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -21,6 +27,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.LineHeightStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -68,6 +75,7 @@ fun TrackerScreen(
     );
 }
 
+
 @Composable
 private fun TrackerScreenContent(
     currentNight: SleepNight?,
@@ -76,62 +84,83 @@ private fun TrackerScreenContent(
     onStopButton: () -> Unit,
     onClearButton: () -> Unit
 ) {
-    Column(
+    Box(
         modifier = Modifier
             .fillMaxSize()
-            .padding(16.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.SpaceBetween // key change here
+            .padding(16.dp)
     ) {
         Column(
-            horizontalAlignment = Alignment.CenterHorizontally
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(bottom = 72.dp)
         ) {
             Row(
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = 16.dp),
                 horizontalArrangement = Arrangement.SpaceAround
             ) {
-                Button(onClick = { onStartButton() }) {
-                    Text(stringResource(R.string.button_start))
+                Button(onClick = onStartButton) {
+                    Text(text = stringResource(R.string.button_start))
                 }
-                Button(onClick = { onStopButton() }) {
+                Button(onClick = onStopButton) {
                     Text(text = stringResource(R.string.button_stop))
                 }
             }
-            Spacer(modifier = Modifier.height(16.dp))
+            currentNight?.let { current ->
+                Text(
+                    text = "Start: ${DateUtils.millisToDate(current.startTimeMilliSeconds)}",
+                    fontWeight = FontWeight.Bold,
+                    modifier = Modifier.padding(bottom = 16.dp)
+                )
+            }
             Text(
                 text = stringResource(R.string.detail),
                 fontWeight = FontWeight.Bold
             )
-            Spacer(modifier = Modifier.height(16.dp))
-            currentNight?.let { current ->
-                Text(
-                    text = "Start: ${DateUtils.millisToDate(current.startTimeMilliSeconds)}"
-                )
-            }
-            Spacer(modifier = Modifier.height(16.dp))
-            Column(
-                horizontalAlignment = Alignment.CenterHorizontally,
-                modifier = Modifier.verticalScroll(rememberScrollState())
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            LazyColumn(
+                modifier = Modifier
+                    .fillMaxSize(),
+                horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                for (night in nights) {
-                    Text(
-                        text = "Start: ${DateUtils.millisToDate(night.startTimeMilliSeconds)}"
-                    )
-                    Text(
-                        text = "End: ${DateUtils.millisToDate(night.endTimeMilliSeconds)}"
-                    )
-                    Text(
-                        text = "Quality: ${night.sleepQuality}"
-                    )
-                    Spacer(modifier = Modifier.height(16.dp))
-                }
-                Button(
-                    onClick = { onClearButton() }
-                ) {
-                    Text(text = stringResource(R.string.button_clear))
+                items(nights) { night ->
+                    TrackerScreenListContent(night);
                 }
             }
         }
+
+        Box(
+            contentAlignment = Alignment.Center,
+            modifier = Modifier
+                .align(Alignment.BottomCenter)
+                .fillMaxWidth()
+        ) {
+            Button(
+                onClick = onClearButton,
+            ) {
+                Text(text = stringResource(R.string.button_clear))
+            }
+        }
+    }
+}
+
+@Composable
+fun TrackerScreenListContent(
+    night: SleepNight,
+    modifier: Modifier = Modifier
+):Unit{
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(vertical = 8.dp)
+    ) {
+        Text(text = "Start: ${DateUtils.millisToDate(night.startTimeMilliSeconds)}")
+        Text(text = "End: ${DateUtils.millisToDate(night.endTimeMilliSeconds)}")
+        Text(text = "Quality: ${night.sleepQuality}")
     }
 }
 

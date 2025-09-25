@@ -35,19 +35,18 @@ class MainActivity : ComponentActivity() {
                         startDestination = TrackerRoute,
                         modifier = Modifier.padding(innerPadding)
                     ){
-                        composable<TrackerRoute>{
-                            val backEntry = navController.getBackStackEntry(TrackerRoute)
-                            val savedStateHandle = backEntry.savedStateHandle
+                        composable<TrackerRoute> { backStackEntry ->
+                            val savedStateHandle = backStackEntry.savedStateHandle;
 
-                            val satisfactionLevelFlow = savedStateHandle.getStateFlow("satisfaction_level", 0)
-                            val satisfactionLevel by satisfactionLevelFlow.collectAsState()
+                            val satisfactionLevelFlow = savedStateHandle.getStateFlow("satisfaction_level", 0);
+                            val satisfactionLevel by satisfactionLevelFlow.collectAsState();
 
                             TrackerScreen(
                                 satisfaction = satisfactionLevel,
                                 onNavigateToSleepQuality = {
-                                    navController.navigate(SleepQualityRoute);
+                                    navController.navigate(SleepQualityRoute)
                                 }
-                            );
+                            )
                         }
 
                         composable<SleepQualityRoute>{
