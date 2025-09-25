@@ -2,6 +2,7 @@ package com.example.sleepnight.ui.tracker
 
 import android.widget.Toast
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -12,8 +13,9 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -31,6 +33,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.sleepnight.R;
 import com.example.sleepnight.common.util.DateUtils
+import com.example.sleepnight.common.util.SleepQualityUtils
 import com.example.sleepnight.data.model.SleepQualityUI
 import com.example.sleepnight.data.persistence.entities.SleepNight
 import com.example.sleepnight.ui.theme.SleepNightTheme
@@ -44,6 +47,7 @@ fun TrackerScreen(
     viewModel: TrackerViewModel = hiltViewModel(),
     satisfaction: Int,
     onNavigateToSleepQuality: () -> Unit,
+    onNavigateToSleepQualityDescription: (SleepNight) -> Unit,
 ): Unit {
     val context = LocalContext.current;
 
@@ -69,7 +73,8 @@ fun TrackerScreen(
                 Toast.makeText(context,"Operation not started yet", Toast.LENGTH_SHORT).show();
             }
         },
-        onClearButton = viewModel::onClearTracking
+        onClearButton = viewModel::onClearTracking,
+        onNavigateToSleepQualityDescription = onNavigateToSleepQualityDescription
     );
 }
 
@@ -79,7 +84,8 @@ private fun TrackerScreenContent(
     nights: List<SleepNight>,
     onStartButton: () -> Unit,
     onStopButton: () -> Unit,
-    onClearButton: () -> Unit
+    onClearButton: () -> Unit,
+    onNavigateToSleepQualityDescription: (SleepNight) -> Unit,
 ) {
     Box(
         modifier = Modifier
@@ -118,14 +124,20 @@ private fun TrackerScreenContent(
 
             Spacer(modifier = Modifier.height(8.dp))
 
-            LazyColumn(
+            LazyVerticalGrid(
                 modifier = Modifier
                     .fillMaxSize(),
-                horizontalAlignment = Alignment.CenterHorizontally
+                // Control how cells are formed into columns or rows
+                columns = GridCells.Adaptive(minSize = 100.dp)
             ) {
                 // Providing a stable key enables item state to be consistent across data-set changes
                 items(nights, key = { night ->  night.nightId }) { night ->
-                    TrackerScreenListContent(night);
+                    TrackerScreenListContent(
+                        night,
+                        onNavigateToSleepQualityDescription = {
+                            onNavigateToSleepQualityDescription(night)
+                        }
+                    )
                 }
             }
         }
@@ -148,37 +160,25 @@ private fun TrackerScreenContent(
 @Composable
 private fun TrackerScreenListContent(
     night: SleepNight,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    onNavigateToSleepQualityDescription: () -> Unit
 ):Unit{
-    val (description, imageId) = getSleepQualityDescriptionAndImageId(night.sleepQuality);
+    val (description, imageId) = SleepQualityUtils.getSleepQualityDescriptionAndImageId(night.sleepQuality);
 
-    Row(
-        modifier = modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.SpaceEvenly,
+    val context = LocalContext.current;
+
+    Column(
+        modifier = modifier.fillMaxWidth().clickable{
+            onNavigateToSleepQualityDescription()
+        },
     ){
         Image(
             painter = painterResource(imageId),
             contentDescription = null,
             modifier = modifier.size(75.dp)
         )
-      Column {
-          Text(text = "Start: ${DateUtils.millisToDate(night.startTimeMilliSeconds)}")
-          Text(text = "Quality: $description")
-      }
-        Spacer(modifier = modifier.height(12.dp))
-    }
-}
 
-// Can implement simple logic into a screen , but more complex one is going to be in the view model (don't depend of state, backend or calculations)
-private fun getSleepQualityDescriptionAndImageId(quality: Int): SleepQualityUI {
-    return when (quality) {
-        0 -> SleepQualityUI("Very Bad", R.drawable.ic_sleep_0)
-        1 -> SleepQualityUI("Poor", R.drawable.ic_sleep_1)
-        2 -> SleepQualityUI("So-so", R.drawable.ic_sleep_2)
-        3 -> SleepQualityUI("Okay", R.drawable.ic_sleep_3)
-        4 -> SleepQualityUI("Good", R.drawable.ic_sleep_4)
-        5 -> SleepQualityUI("Excellent", R.drawable.ic_sleep_5)
-        else -> SleepQualityUI("Unknown", R.drawable.ic_sleep_0)
+        Text(text = description)
     }
 }
 
@@ -191,7 +191,8 @@ private fun TrackerScreenPreview(): Unit {
             emptyList(),
             onClearButton = {},
             onStartButton = {},
-            onStopButton = {}
+            onStopButton = {},
+            onNavigateToSleepQualityDescription = {}
         );
     }
 }

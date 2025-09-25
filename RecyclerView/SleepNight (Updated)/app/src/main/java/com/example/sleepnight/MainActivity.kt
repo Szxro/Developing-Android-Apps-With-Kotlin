@@ -13,8 +13,11 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.toRoute
 import com.example.sleepnight.ui.quality.SleepQualityRoute
 import com.example.sleepnight.ui.quality.SleepQualityScreen
+import com.example.sleepnight.ui.qualitydescription.QualityDescriptionRoute
+import com.example.sleepnight.ui.qualitydescription.QualityDescriptionScreen
 import com.example.sleepnight.ui.theme.SleepNightTheme
 import com.example.sleepnight.ui.tracker.TrackerRoute
 import com.example.sleepnight.ui.tracker.TrackerScreen
@@ -45,6 +48,15 @@ class MainActivity : ComponentActivity() {
                                 satisfaction = satisfactionLevel,
                                 onNavigateToSleepQuality = {
                                     navController.navigate(SleepQualityRoute)
+                                },
+                                onNavigateToSleepQualityDescription = { night ->
+                                    navController.navigate(
+                                        QualityDescriptionRoute(
+                                            quality = night.sleepQuality,
+                                            start = night.startTimeMilliSeconds,
+                                            end = night.endTimeMilliSeconds
+                                        )
+                                    )
                                 }
                             )
                         }
@@ -59,6 +71,20 @@ class MainActivity : ComponentActivity() {
 
                                     // Go back to Tracker Route
                                     navController.popBackStack();
+                                }
+                            )
+                        }
+
+                        composable<QualityDescriptionRoute>{ entry ->
+                            // Getting the params
+                            val (quality,start, end) = entry.toRoute<QualityDescriptionRoute>();
+
+                            QualityDescriptionScreen(
+                                quality,
+                                start,
+                                end,
+                                onCloseButton = {
+                                    navController.popBackStack()
                                 }
                             )
                         }
