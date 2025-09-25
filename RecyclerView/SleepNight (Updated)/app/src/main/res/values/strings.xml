@@ -4,6 +4,6 @@
     <string name="button_stop">Stop</string>
     <string name="button_close">Close</string>
     <string name="button_clear">Clear</string>
-    <string name="detail">HERE IS YOUR SLEEP DATA</string>
+    <string name="detail">Sleep Results</string>
     <string name="detail_sleep">How was your sleep?</string>
 </resources>

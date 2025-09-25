@@ -28,7 +28,9 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.sleepnight.R;
@@ -117,27 +119,33 @@ private fun TrackerScreenContent(
                     modifier = Modifier.padding(bottom = 16.dp)
                 )
             }
-            Text(
-                text = stringResource(R.string.detail),
-                fontWeight = FontWeight.Bold
-            )
 
             Spacer(modifier = Modifier.height(8.dp))
 
-            LazyVerticalGrid(
-                modifier = Modifier
-                    .fillMaxSize(),
-                // Control how cells are formed into columns or rows
-                columns = GridCells.Adaptive(minSize = 100.dp)
-            ) {
-                // Providing a stable key enables item state to be consistent across data-set changes
-                items(nights, key = { night ->  night.nightId }) { night ->
-                    TrackerScreenListContent(
-                        night,
-                        onNavigateToSleepQualityDescription = {
-                            onNavigateToSleepQualityDescription(night)
-                        }
-                    )
+            Column{
+                Text(
+                    text = stringResource(R.string.detail),
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 30.sp
+                )
+
+                Spacer(modifier = Modifier.height(25.dp))
+
+                LazyVerticalGrid(
+                    modifier = Modifier
+                        .fillMaxSize(),
+                    // Control how cells are formed into columns or rows
+                    columns = GridCells.Adaptive(minSize = 100.dp)
+                ) {
+                    // Providing a stable key enables item state to be consistent across data-set changes
+                    items(nights, key = { night ->  night.nightId }) { night ->
+                        TrackerScreenListContent(
+                            night,
+                            onNavigateToSleepQualityDescription = {
+                                onNavigateToSleepQualityDescription(night)
+                            }
+                        )
+                    }
                 }
             }
         }
