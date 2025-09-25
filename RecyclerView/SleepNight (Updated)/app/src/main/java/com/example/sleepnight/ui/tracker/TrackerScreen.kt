@@ -123,7 +123,8 @@ private fun TrackerScreenContent(
                     .fillMaxSize(),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                items(nights) { night ->
+                // Providing a stable key enables item state to be consistent across data-set changes
+                items(nights, key = { night ->  night.nightId }) { night ->
                     TrackerScreenListContent(night);
                 }
             }
@@ -168,7 +169,7 @@ private fun TrackerScreenListContent(
     }
 }
 
-// Can implement simple logic into a screen , but more complex one is going to be in the view model
+// Can implement simple logic into a screen , but more complex one is going to be in the view model (don't depend of state, backend or calculations)
 private fun getSleepQualityDescriptionAndImageId(quality: Int): SleepQualityUI {
     return when (quality) {
         0 -> SleepQualityUI("Very Bad", R.drawable.ic_sleep_0)
