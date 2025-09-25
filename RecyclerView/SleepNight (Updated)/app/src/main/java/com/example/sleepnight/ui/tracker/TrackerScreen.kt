@@ -165,8 +165,6 @@ private fun TrackerScreenListContent(
 ):Unit{
     val (description, imageId) = SleepQualityUtils.getSleepQualityDescriptionAndImageId(night.sleepQuality);
 
-    val context = LocalContext.current;
-
     Column(
         modifier = modifier.fillMaxWidth().clickable{
             onNavigateToSleepQualityDescription()
